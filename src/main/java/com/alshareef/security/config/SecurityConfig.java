@@ -18,21 +18,31 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
-    public SecurityConfig() {
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable).sessionManagement((session) -> {
-            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        }).authorizeHttpRequests((auth) -> {
-            ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)auth.requestMatchers(new String[]{"/v1/api/auth/**"})).permitAll().anyRequest()).authenticated();
-        });
-        http.addFilterBefore(this.jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        return (SecurityFilterChain)http.build();
+
+//        http
+//                .csrf(csrf -> csrf.enable())  // Enable CSRF for web applications
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // Use stateful sessions if required
+//                        .maximumSessions(1)  // Optional: Limit to one session per user
+//                );
+
+        http.csrf(AbstractHttpConfigurer::disable)// New way to disable CSRF
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Use stateless sessions
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/v1/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
+                );
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     @Bean
