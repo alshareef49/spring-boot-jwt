@@ -1,5 +1,6 @@
 package com.alshareef.security.utils;
 
+import com.alshareef.security.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,6 +14,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.GrantedAuthority;
 
 @Component
 public class JwtUtil {
@@ -25,7 +27,13 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap();
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()  // Assumes the user has one role; adapt if multiple roles are allowed
+                .map(GrantedAuthority::getAuthority)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role",role);
         return this.createToken(claims, userDetails.getUsername());
     }
 
@@ -33,7 +41,13 @@ public class JwtUtil {
         Instant currentInstant = Instant.now();
         Date issueDate = Date.from(currentInstant);
         Date expirationDate = Date.from(currentInstant.plusSeconds(this.expireTokenTime));
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(issueDate).setExpiration(expirationDate).signWith(this.getSigningKey(), SignatureAlgorithm.HS256).setHeaderParam("typ", "JWT").compact();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(issueDate)
+                .setExpiration(expirationDate)
+                .signWith(this.getSigningKey(), SignatureAlgorithm.HS256)
+                .setHeaderParam("typ", "JWT").compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
@@ -42,8 +56,19 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        Claims claims = (Claims)Jwts.parserBuilder().setSigningKey(this.getSigningKey()).build().parseClaimsJws(token).getBody();
+        Claims claims = (Claims)Jwts
+                .parserBuilder()
+                .setSigningKey(this.getSigningKey())
+                .build().parseClaimsJws(token).getBody();
         return claims.getSubject();
+    }
+
+    public String extractRole(String token) {
+        Claims claims = (Claims)Jwts
+                .parserBuilder()
+                .setSigningKey(this.getSigningKey())
+                .build().parseClaimsJws(token).getBody();
+        return claims.get("role", String.class);
     }
 
     private Boolean isTokenExpired(String token) {

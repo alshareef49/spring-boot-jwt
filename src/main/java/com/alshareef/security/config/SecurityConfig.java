@@ -38,6 +38,10 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v1/api/auth/**").permitAll()
+                        .requestMatchers("/author/**").hasRole("AUTHOR")
+                        .requestMatchers("/editor/**").hasRole("EDITOR")
+                        .requestMatchers("/reviewer/**").hasRole("REVIEWER")
+                        .requestMatchers("/approver/**").hasRole("APPROVER")
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

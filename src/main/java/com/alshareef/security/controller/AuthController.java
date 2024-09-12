@@ -50,7 +50,11 @@ public class AuthController {
     @PostMapping({"/signup"})
     public ResponseEntity<?> signup(@RequestBody User user) {
         user.setPassword((new BCryptPasswordEncoder()).encode(user.getPassword()));
-        user.setRole("ROLE_USER");
+        if (user.getRole() == null) {
+            user.setRole("USER");
+        } else {
+            user.setRole(user.getRole());
+        }
         this.userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
