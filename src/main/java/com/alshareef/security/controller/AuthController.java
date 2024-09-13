@@ -5,7 +5,9 @@ import com.alshareef.security.dto.AuthResponse;
 import com.alshareef.security.entity.User;
 import com.alshareef.security.repository.UserRepository;
 import com.alshareef.security.service.CustomUserDetailsService;
+import com.alshareef.security.service.EmailService;
 import com.alshareef.security.utils.JwtUtil;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping({"/v1/api/auth"})
 public class AuthController {
@@ -30,6 +34,9 @@ public class AuthController {
     private CustomUserDetailsService userDetailsService;
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     public AuthController() {
     }
@@ -48,7 +55,7 @@ public class AuthController {
     }
 
     @PostMapping({"/signup"})
-    public ResponseEntity<?> signup(@RequestBody User user) {
+    public ResponseEntity<?> signup(@RequestBody User user) throws MessagingException, IOException {
         user.setPassword((new BCryptPasswordEncoder()).encode(user.getPassword()));
         if (user.getRole() == null) {
             user.setRole("USER");
@@ -56,6 +63,9 @@ public class AuthController {
             user.setRole(user.getRole());
         }
         this.userRepository.save(user);
+        String subject = "Welcome to Our Application!";
+        String body = "Hi " + user.getUsername() + ",\n\nThank you for signing up! We're glad to have you.";
+        emailService.sendHtmlEmail(user, subject, body);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 }

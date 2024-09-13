@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Our Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            color: white;
+            background-color: #4CAF50;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Welcome to Our Platform, {{username}}!</h1>
+    </div>
+    <div class="content">
+        <p>Hi {{username}},</p>
+        <p>We're excited to have you join us! You have successfully signed up as a <strong>{{role}}</strong> on our platform. Here's a brief overview of what you can do:</p>
+        <ul>
+            <li>Explore your dashboard</li>
+            <li>Start using your features based on your role: <strong>{{role}}</strong></li>
+            <li>Connect with other users and explore new opportunities</li>
+        </ul>
+        <p>To get started, click the button below to log in and explore:</p>
+        <a href="https://your-platform-url.com/login" class="btn">Log In to Your Account</a>
+        <p>If you have any questions or need assistance, feel free to reply to this email or visit our support page.</p>
+        <p>Thanks,</p>
+        <p>The Journal Publication Team</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2024 Journal Publication. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>
